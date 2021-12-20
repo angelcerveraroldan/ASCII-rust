@@ -9,10 +9,10 @@ fn main() {
     let pixel_count = img.len();
 
     for i in 0..(pixel_count / 3) {
-        print!(
-            "{}",
-            rgb_to_ascii(img[i * 3], img[(i * 3) + 1], img[(i * 3) + 2])
-        );
+        let c: char = rgb_to_ascii(img[i * 3], img[(i * 3) + 1], img[(i * 3) + 2]);
+
+        // Print character twice to make image look nicer
+        print!("{}{}", c, c);
         if i % width == 0 {
             println!();
         }
@@ -36,7 +36,7 @@ fn rgb_to_ascii(red: u8, green: u8, blue: u8) -> char {
     // This will range from 0 to 255 too, the higher the brighter the color is
     let brightness: f32 = 0.299 * red as f32 + 0.587 * green as f32 + 0.114 * blue as f32;
 
-    // Multiplying my 0.0392 and rounding down, we will get a number between 0 and 9, inclusive. The lower this number is, the darkers the pixels rgb value was
+    // Multiplying my 0.0392 (10/255) and rounding down, we will get a number between 0 and 9, inclusive. The lower this number is, the darkers the pixels rgb value was
     let char_index: usize = (0.0392 * brightness).floor() as usize;
     characters.chars().nth(char_index).unwrap()
 }
