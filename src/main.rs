@@ -1,19 +1,36 @@
 use image;
+use std::env;
 
 /// Main function
 fn main() {
+    let args: Vec<String> = env::args().collect();
+    println!("{:?}", args);
+
+    let path: String = String::from(&args[1]);
+
     // Open image and turn and turn it into a Vector of its pixels
-    let img = image::open("./src/images/eagle.jpeg").unwrap().into_bytes();
-    // Todo, change images width
-    let width = 100;
+    let img = image::open(path).unwrap();
+
+    image_to_ascii(img, 150);
+}
+
+/// This function will take an image, and print it using ascii characters
+fn image_to_ascii(img: image::DynamicImage, desired_width: u32) {
+    // Nearest is the fastest filter
+    let img = img
+        .resize(desired_width, 10000000, image::imageops::Nearest)
+        .into_bytes();
+
     let pixel_count = img.len();
 
     for i in 0..(pixel_count / 3) {
+        // img contains a vec<u8> that has the first pixels r, then the first pixels g, then the first pixels b, then the second pixels...
         let c: char = rgb_to_ascii(img[i * 3], img[(i * 3) + 1], img[(i * 3) + 2]);
 
         // Print character twice to make image look nicer
         print!("{}{}", c, c);
-        if i % width == 0 {
+
+        if i % desired_width as usize == 0 {
             println!();
         }
     }
@@ -24,7 +41,7 @@ fn main() {
 /// ```
 /// assert_eq!(rgb_to_ascii(12, 56, 12), ':');
 ///
-/// // This is the brightest possible character to be returned.
+/// //  This is the brightest possible character to be returned.
 /// assert_eq!(rgb_to_ascii(255, 255, 255), '@');
 /// ```
 /// The charactes that can be returned are, in order from darkest to lightest: ``` .:-=+*#%@```
