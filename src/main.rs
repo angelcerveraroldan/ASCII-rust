@@ -1,39 +1,85 @@
-use image;
+use image::{self, EncodableLayout};
 use std::env;
+use termion::{self, terminal_size};
 
 /// Main function
 fn main() {
     let args: Vec<String> = env::args().collect();
-    println!("{:?}", args);
 
     let path: String = String::from(&args[1]);
+    let desired_width = args[2]
+        .parse::<u32>()
+        .expect("Please make sure that that you have entered a valid resolution");
 
     // Open image and turn and turn it into a Vector of its pixels
-    let img = image::open(path).unwrap();
+    let img = image::open(path).expect("Could not open image");
 
-    image_to_ascii(img, 150);
+    image_to_ascii(img, desired_width);
 }
 
 /// This function will take an image, and print it using ascii characters
 fn image_to_ascii(img: image::DynamicImage, desired_width: u32) {
+    let term_size = terminal_size().expect("Couldn't get terminal size");
+
     // Nearest is the fastest filter
     let img = img
         .resize(desired_width, 10000000, image::imageops::Nearest)
-        .into_bytes();
+        .to_rgb8();
 
-    let pixel_count = img.len();
+    let img_width = img.width();
+    let img_height = img.height();
 
-    for i in 0..(pixel_count / 3) {
-        // img contains a vec<u8> that has the first pixels r, then the first pixels g, then the first pixels b, then the second pixels...
-        let c: char = rgb_to_ascii(img[i * 3], img[(i * 3) + 1], img[(i * 3) + 2]);
+    println!(
+        "Some info: Screen size: ({},{}) Image size: ({},{})",
+        term_size.0,
+        term_size.1,
+        img.width(),
+        img.height()
+    );
 
-        // Print character twice to make image look nicer
-        print!("{}{}", c, c);
+    if (term_size.0 as u32) < img_width || (term_size.1 as u32) < img_height {
+        panic!("The image does not fit in the terminal, please zoom out or lower resolution");
+    }
 
-        if i % desired_width as usize == 0 {
-            println!();
+    let img_bytes = img.as_bytes();
+    println!("{}", termion::clear::All);
+
+    for column in 0..img_height as usize {
+        for row in 0..img_width as usize {
+            let i = (column * img_width as usize) + row;
+
+            let c: char = rgb_to_ascii(
+                img_bytes[i * 3],
+                img_bytes[(i * 3) + 1],
+                img_bytes[(i * 3) + 2],
+            );
+
+            // Display the pixel as a character
+            print!(
+                "{}{}{}",
+                termion::cursor::Goto((2 * row as u16) + 1, column as u16 + 1),
+                c,
+                c
+            );
         }
     }
+
+    // for i in 0..(pixel_count / 3) {
+    //     // img contains a vec<u8> that has the first pixels r, then the first pixels g, then the first pixels b, then the second pixels...
+    //     let c: char = rgb_to_ascii(
+    //         img_bytes[i * 3],
+    //         img_bytes[(i * 3) + 1],
+    //         img_bytes[(i * 3) + 2],
+    //     );
+
+    //     // Print character twice to make image look nicer
+    //     print!("{}{}", c, c);
+
+    //     if (i + 1) % desired_width as usize == 0 {
+    //         println!();
+    //     }
+    // }
+    // println!();
 }
 
 /// Given an rgb value, return an ascii character.
@@ -60,7 +106,7 @@ fn rgb_to_ascii(red: u8, green: u8, blue: u8) -> char {
 
 #[test]
 fn testing() {
-    // White should be brighterst (@) and black shoud be darkest ' '
+    // White should be brightness (@) and black should be darkest ' '
     assert_eq!(rgb_to_ascii(255, 255, 255), '@');
     assert_eq!(rgb_to_ascii(0, 0, 0), ' ');
 }
