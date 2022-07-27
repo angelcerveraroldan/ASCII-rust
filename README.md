@@ -23,3 +23,6 @@ The following image:
  with a desired width resolution of 700, showed the following in the terminal:
  
 ![generated_image](./docs/eagle700w.png "Generated Image")
+
+## Limitations
+Because the image is printed using characters, the users has to manually zoom out a lot to be able to generate an image with a high resolution.
