@@ -13,3 +13,13 @@ thread 'main' panicked at 'The image does not fit in the terminal, please zoom o
 ```
 
 This indicates that the image does not fit in the terminal in the desired resoultion. To fic this, lower the desired width resolution or zoom out so that more characters fit in screen
+
+
+## Example
+The following image:
+
+![base_image](./docs/eagle.jpg "Base Image")
+
+ with a desired width resolution of 700, showed the following in the terminal:
+ 
+![generated_image](./docs/eagle700w.png "Generated Image")
