@@ -12,7 +12,7 @@ Some info: Screen size: (178,45) Image size: (700,364)
 thread 'main' panicked at 'The image does not fit in the terminal, please zoom out or lower resolution', src/main.rs:43:9
 ```
 
-This indicates that the image does not fit in the terminal in the desired resoultion. To fic this, lower the desired width resolution or zoom out so that more characters fit in screen
+This indicates that the image does not fit in the terminal in the desired resoultion. To fix this, lower the desired width resolution or zoom out so that more characters fit in screen
 
 
 ## Example
